@@ -179,21 +179,26 @@ public class PedidoController {
         return nuevos.stream().map(this::toPedidoResponse).collect(Collectors.toList());
     }
 
-    @GetMapping("/todos")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
-    @Transactional(readOnly = true)
-    public List<PedidoResponse> getTodos() {
-        List<Pedido> todos = pedidoRepository.findAllByOrderByFechaHoraDesc();
-        return todos.stream().map(this::toPedidoResponse).collect(Collectors.toList());
-    }
-
     @PutMapping("/{id}/leido")
     @PreAuthorize("hasAnyRole('PERSONAL', 'ADMINISTRADOR')")
     @Transactional
     public ResponseEntity<PedidoResponse> marcarLeido(@PathVariable Integer id) {
         return pedidoRepository.findById(id)
                 .map(pedido -> {
-                    pedido.setEstado(Pedido.Estado.en_camino);
+                    pedido.setEstado(Pedido.Estado.en_preparacion);
+                    pedidoRepository.save(pedido);
+                    return ResponseEntity.ok(toPedidoResponse(pedido));
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}/entregar")
+    @PreAuthorize("hasAnyRole('PERSONAL', 'ADMINISTRADOR')")
+    @Transactional
+    public ResponseEntity<PedidoResponse> marcarEntregado(@PathVariable Integer id) {
+        return pedidoRepository.findById(id)
+                .map(pedido -> {
+                    pedido.setEstado(Pedido.Estado.entregado);
                     pedidoRepository.save(pedido);
                     return ResponseEntity.ok(toPedidoResponse(pedido));
                 })
