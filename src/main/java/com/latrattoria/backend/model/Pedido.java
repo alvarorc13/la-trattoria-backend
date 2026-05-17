@@ -42,7 +42,7 @@ public class Pedido {
         mesa, recogida
     }
     public enum Estado {
-        nuevo, en_preparacion, listo, entregado, cancelado
+        nuevo, en_camino
     }
     public enum MetodoPago {
         tarjeta, PayPal, Bizum, efectivo

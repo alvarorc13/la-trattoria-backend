@@ -12,4 +12,5 @@ public interface PedidoRepository extends JpaRepository<Pedido, Integer> {
     List<Pedido> findByMesa(Mesa mesa);
     List<Pedido> findByEstado(Pedido.Estado estado);
     List<Pedido> findByMesaAndEstado(Mesa mesa, Pedido.Estado estado);
+    List<Pedido> findAllByOrderByFechaHoraDesc();
 }
