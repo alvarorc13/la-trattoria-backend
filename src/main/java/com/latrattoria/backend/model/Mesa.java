@@ -5,7 +5,8 @@ import lombok.*;
 
 @Entity
 @Table(name = "Mesa")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Mesa {
@@ -25,4 +26,14 @@ public class Mesa {
 
     @Column(nullable = false)
     private Boolean disponible = true;
+    @Override
+    public String toString() {
+        return "Mesa{" +
+                "id=" + id +
+                ", numero=" + numero +
+                ", codigoQr='" + codigoQr + '\'' +
+                ", capacidad=" + capacidad +
+                ", disponible=" + disponible +
+                '}';
+    }
 }

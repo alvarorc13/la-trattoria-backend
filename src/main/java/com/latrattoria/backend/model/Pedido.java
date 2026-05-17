@@ -7,7 +7,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "Pedido")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Pedido {
@@ -46,5 +47,17 @@ public class Pedido {
     }
     public enum MetodoPago {
         tarjeta, PayPal, Bizum, efectivo
+    }
+    @Override
+    public String toString() {
+        return "Pedido{" +
+                "id=" + id +
+                ", mesa=" + (mesa != null ? mesa.getId() : null) +
+                ", fechaHora=" + fechaHora +
+                ", modalidad=" + modalidad +
+                ", estado=" + estado +
+                ", metodoPago=" + metodoPago +
+                ", detalles.size=" + (detalles != null ? detalles.size() : 0) +
+                '}';
     }
 }

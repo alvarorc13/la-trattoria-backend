@@ -5,7 +5,8 @@ import lombok.*;
 
 @Entity
 @Table(name = "DetallePedido")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class DetallePedido {
@@ -27,4 +28,13 @@ public class DetallePedido {
 
     @Column(name = "instrucciones_especiales", columnDefinition = "text")
     private String instruccionesEspeciales;
+    @Override
+    public String toString() {
+        return "DetallePedido{" +
+                "id=" + id +
+                ", pedidoId=" + (pedido != null ? pedido.getId() : null) +
+                ", platoId=" + (plato != null ? plato.getId() : null) +
+                ", cantidad=" + cantidad +
+                '}';
+    }
 }
