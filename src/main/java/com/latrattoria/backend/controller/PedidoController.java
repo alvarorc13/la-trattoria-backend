@@ -183,13 +183,23 @@ public class PedidoController {
     @PreAuthorize("hasAnyRole('PERSONAL', 'ADMINISTRADOR')")
     @Transactional
     public ResponseEntity<PedidoResponse> marcarLeido(@PathVariable Integer id) {
-        return pedidoRepository.findById(id)
-                .map(pedido -> {
-                    pedido.setEstado(Pedido.Estado.en_preparacion);
-                    pedidoRepository.save(pedido);
-                    return ResponseEntity.ok(toPedidoResponse(pedido));
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        try {
+            return pedidoRepository.findById(id)
+                    .map(pedido -> {
+                        // Log estado antes
+                        System.out.println("[DEBUG] Pedido antes de marcar leido: " + pedido);
+                        pedido.setEstado(Pedido.Estado.en_preparacion);
+                        Pedido saved = pedidoRepository.save(pedido);
+                        // Log estado después
+                        System.out.println("[DEBUG] Pedido después de marcar leido: " + saved);
+                        return ResponseEntity.ok(toPedidoResponse(saved));
+                    })
+                    .orElseGet(() -> ResponseEntity.notFound().build());
+        } catch (Exception e) {
+            System.err.println("[ERROR] Error al marcar pedido como leido: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @PutMapping("/{id}/entregar")
