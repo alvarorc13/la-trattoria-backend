@@ -36,7 +36,7 @@ public class Pedido {
     @Column(name = "metodo_pago", nullable = false)
     private MetodoPago metodoPago;
 
-    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetallePedido> detalles;
 
     public enum Modalidad {
