@@ -172,7 +172,7 @@ public class PedidoController {
     }
 
     @GetMapping("/pendientes")
-    @PreAuthorize("hasAnyRole('PERSONAL', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('personal', 'administrador')")
     @Transactional(readOnly = true)
     public List<PedidoResponse> getPendientes() {
         List<Pedido> nuevos = pedidoRepository.findByEstado(Pedido.Estado.nuevo);
@@ -180,7 +180,7 @@ public class PedidoController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasRole('administrador')")
     @Transactional(readOnly = true)
     public List<PedidoResponse> getAllPedidos() {
     	List<Pedido> pedidos = pedidoRepository.findAll();
@@ -188,7 +188,7 @@ public class PedidoController {
     }
     
     @PutMapping("/{id}/leido")
-    @PreAuthorize("hasAnyRole('PERSONAL', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('personal', 'administrador')")
     @Transactional
     public ResponseEntity<PedidoResponse> marcarLeido(@PathVariable Integer id) {
         try {
@@ -211,7 +211,7 @@ public class PedidoController {
     }
 
     @PutMapping("/{id}/entregar")
-    @PreAuthorize("hasAnyRole('PERSONAL', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('personal', 'administrador')")
     @Transactional
     public ResponseEntity<PedidoResponse> marcarEntregado(@PathVariable Integer id) {
         return pedidoRepository.findById(id)
