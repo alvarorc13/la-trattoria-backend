@@ -33,11 +33,20 @@ public class UsuarioSistemaController {
 
     @PutMapping("/{id}")
     public ResponseEntity<UsuarioSistema> updateUsuario(@PathVariable Integer id, @RequestBody UsuarioSistema usuario) {
-        if (!usuarioRepo.existsById(id)) {
+        Optional<UsuarioSistema> usuarioActualOpt = usuarioRepo.findById(id);
+        if (usuarioActualOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        usuario.setId(id);
-        return ResponseEntity.ok(usuarioRepo.save(usuario));
+        UsuarioSistema usuarioActual = usuarioActualOpt.get();
+        usuarioActual.setNombre(usuario.getNombre());
+        usuarioActual.setEmail(usuario.getEmail());
+        usuarioActual.setRol(usuario.getRol());
+        usuarioActual.setActivo(usuario.getActivo());
+        // Solo actualiza el password si viene en el request
+        if (usuario.getPasswordHash() != null) {
+            usuarioActual.setPasswordHash(usuario.getPasswordHash());
+        }
+        return ResponseEntity.ok(usuarioRepo.save(usuarioActual));
     }
 
     @DeleteMapping("/{id}")
