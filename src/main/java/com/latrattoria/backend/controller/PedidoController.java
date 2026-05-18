@@ -179,6 +179,14 @@ public class PedidoController {
         return nuevos.stream().map(this::toPedidoResponse).collect(Collectors.toList());
     }
 
+    @GetMapping
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @Transactional(readOnly = true)
+    public List<PedidoResponse> getAllPedidos() {
+    	List<Pedido> pedidos = pedidoRepository.findAll();
+    	return pedidos.stream().map(this::toPedidoResponse).collect(Collectors.toList());
+    }
+    
     @PutMapping("/{id}/leido")
     @PreAuthorize("hasAnyRole('PERSONAL', 'ADMINISTRADOR')")
     @Transactional
