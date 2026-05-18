@@ -222,4 +222,15 @@ public class PedidoController {
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+    
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @Transactional
+    public ResponseEntity<Void> eliminarPedido(@PathVariable Integer id) {
+        if (!pedidoRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        pedidoRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
 }
