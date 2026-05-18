@@ -49,7 +49,7 @@ public class UsuarioSistemaController {
         usuarioActual.setActivo(usuario.getActivo());
         // Solo actualiza el password si viene en el request
         if (usuario.getPasswordHash() != null) {
-            usuarioActual.setPasswordHash(usuario.getPasswordHash());
+            usuarioActual.setPasswordHash(passwordEncoder.encode(usuario.getPasswordHash()));
         }
         return ResponseEntity.ok(usuarioRepo.save(usuarioActual));
     }
