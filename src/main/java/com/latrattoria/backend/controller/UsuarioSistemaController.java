@@ -4,6 +4,7 @@ import com.latrattoria.backend.model.UsuarioSistema;
 import com.latrattoria.backend.repository.UsuarioSistemaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,6 +15,9 @@ import java.util.Optional;
 public class UsuarioSistemaController {
     @Autowired
     private UsuarioSistemaRepository usuarioRepo;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping("/admin/todos")
     public List<UsuarioSistema> getAllUsuarios() {
@@ -28,6 +32,7 @@ public class UsuarioSistemaController {
 
     @PostMapping
     public UsuarioSistema createUsuario(@RequestBody UsuarioSistema usuario) {
+        usuario.setPasswordHash(passwordEncoder.encode(usuario.getPasswordHash()));
         return usuarioRepo.save(usuario);
     }
 
