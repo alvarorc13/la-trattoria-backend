@@ -1,0 +1,19 @@
+steps:
+  - name: 'maven:3.9.6-eclipse-temurin-17'
+    entrypoint: 'mvn'
+    args: ['clean', 'package', '-DskipTests']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'europe-southwest1-docker.pkg.dev/$PROJECT_ID/la-trattoria-backend/backend-image', '.']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'europe-southwest1-docker.pkg.dev/$PROJECT_ID/la-trattoria-backend/backend-image']
+
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      [
+        'run', 'deploy', 'la-trattoria-backend',
+        '--image', 'europe-southwest1-docker.pkg.dev/$PROJECT_ID/la-trattoria-backend/backend-image',
+        '--region', 'europe-southwest1',
+        '--allow-unauthenticated'
+      ]
