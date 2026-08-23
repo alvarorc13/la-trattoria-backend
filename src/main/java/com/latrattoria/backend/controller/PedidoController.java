@@ -114,14 +114,25 @@ public class PedidoController {
         List<DetalleResponse> items = new ArrayList<>();
         if (p.getDetalles() != null) {
             for (DetallePedido d : p.getDetalles()) {
-                total = total.add(d.getPlato().getPrecio().multiply(BigDecimal.valueOf(d.getCantidad())));
-                items.add(new DetalleResponse(d.getPlato().getNombre(), d.getCantidad(), d.getPlato().getPrecio().doubleValue()));
+                if (d == null) continue;
+                if (d.getPlato() != null && d.getPlato().getPrecio() != null) {
+                    total = total.add(d.getPlato().getPrecio().multiply(BigDecimal.valueOf(d.getCantidad())));
+                }
+                String nombre = d.getPlato() != null ? d.getPlato().getNombre() : "";
+                Double precio = d.getPlato() != null && d.getPlato().getPrecio() != null ? d.getPlato().getPrecio().doubleValue() : 0.0;
+                items.add(new DetalleResponse(nombre, d.getCantidad(), precio));
             }
+        }
+        MesaResponse mesaResp = null;
+        if (p.getMesa() != null) {
+            Integer mesaId = p.getMesa().getId();
+            Integer numero = p.getMesa().getNumero();
+            mesaResp = new MesaResponse(mesaId, numero);
         }
         return new PedidoResponse(
                 p.getId(),
-                new MesaResponse(p.getMesa().getId(), p.getMesa().getNumero()),
-                p.getEstado().name(),
+                mesaResp,
+                p.getEstado() != null ? p.getEstado().name() : null,
                 p.getFechaHora(),
                 total.doubleValue(),
                 items
@@ -197,6 +208,15 @@ public class PedidoController {
                         // Log estado antes
                         System.out.println("[DEBUG] Pedido antes de marcar leido: " + pedido);
                         pedido.setEstado(Pedido.Estado.en_preparacion);
+                        // Ensure required fields are present to avoid DB constraint violations
+                        if (pedido.getMetodoPago() == null) {
+                            pedido.setMetodoPago(Pedido.MetodoPago.tarjeta);
+                        }
+                        if (pedido.getMesa() == null) {
+                            // Missing mesa would cause DB constraint errors; log and return 500
+                            System.err.println("[ERROR] Pedido id=" + pedido.getId() + " tiene mesa nula, abortando save");
+                            throw new IllegalStateException("Pedido sin mesa");
+                        }
                         Pedido saved = pedidoRepository.save(pedido);
                         // Log estado después
                         System.out.println("[DEBUG] Pedido después de marcar leido: " + saved);
