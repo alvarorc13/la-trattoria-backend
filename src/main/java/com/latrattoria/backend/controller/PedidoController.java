@@ -30,6 +30,12 @@ public class PedidoController {
     @Autowired
     private PlatoRepository platoRepository;
 
+    @Autowired
+    private com.latrattoria.backend.service.NotificacionService notificacionService;
+
+    @Autowired
+    private org.springframework.messaging.simp.SimpMessagingTemplate simpMessagingTemplate;
+
     // DTO para la request de crear pedido
     public static class LineaRequest {
         private Integer platoId;
@@ -178,6 +184,24 @@ public class PedidoController {
 
         pedido.setDetalles(detalles);
         Pedido saved = pedidoRepository.save(pedido);
+
+        // Crear notificación y guardarla
+        com.latrattoria.backend.model.Notificacion noti = new com.latrattoria.backend.model.Notificacion();
+        noti.setPedido(saved);
+        noti.setMensaje("Nuevo pedido: #" + saved.getId());
+        noti.setFechaHora(java.time.LocalDateTime.now());
+        noti.setTipo(com.latrattoria.backend.model.Notificacion.Tipo.ESTADO_PEDIDO);
+        noti.setLeida(false);
+        com.latrattoria.backend.model.Notificacion savedNoti = notificacionService.save(noti);
+
+        // Emitir por WebSocket a cocineros
+        java.util.Map<String, Object> payload = java.util.Map.of(
+                "id", savedNoti.getId(),
+                "mensaje", savedNoti.getMensaje(),
+                "pedidoId", saved.getId(),
+                "fechaHora", savedNoti.getFechaHora().toString()
+        );
+        simpMessagingTemplate.convertAndSend("/topic/notificaciones/cocineros", payload);
 
         return ResponseEntity.status(201).body(toPedidoResponse(saved));
     }
