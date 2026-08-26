@@ -195,15 +195,19 @@ public class PedidoController {
         com.latrattoria.backend.model.Notificacion savedNoti = notificacionService.save(noti);
 
         // Emitir por WebSocket a cocineros
+        PedidoResponse pedidoResponse = toPedidoResponse(saved);
         java.util.Map<String, Object> payload = java.util.Map.of(
                 "id", savedNoti.getId(),
                 "mensaje", savedNoti.getMensaje(),
                 "pedidoId", saved.getId(),
-                "fechaHora", savedNoti.getFechaHora().toString()
+            "fechaHora", savedNoti.getFechaHora().toString(),
+            "mesa", pedidoResponse.getMesa(),
+            "total", pedidoResponse.getTotal(),
+            "detalles", pedidoResponse.getDetalles()
         );
         simpMessagingTemplate.convertAndSend("/topic/notificaciones/cocineros", payload);
 
-        return ResponseEntity.status(201).body(toPedidoResponse(saved));
+        return ResponseEntity.status(201).body(pedidoResponse);
     }
 
     @GetMapping("/pendientes")
